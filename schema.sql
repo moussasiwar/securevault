@@ -39,5 +39,7 @@ CREATE TABLE audit_logs (
     created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+
+
 CREATE INDEX idx_notes_owner ON notes(owner_id);
 CREATE INDEX idx_sessions_user ON sessions(user_id);

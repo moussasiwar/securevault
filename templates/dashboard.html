@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="app-shell">
+  <div class="dash-header">
+    <div>
+      <h1>Bienvenue, {{ user.username }}</h1>
+      <div class="meta-row">
+        <span class="role-badge {{ 'role-badge--admin' if user.role == 'admin' }}">{{ user.role }}</span>
+      </div>
+    </div>
+    <a href="{{ url_for('logout') }}" class="logout-link">Se déconnecter</a>
+  </div>
+
+  <div class="panel">
+    <p>Vos notes chiffrées apparaîtront ici (semaine 3).</p>
+  </div>
+</div>
+{% endblock %}

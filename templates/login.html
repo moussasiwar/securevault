@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="page-center">
+  <div class="card">
+    <h1>Connexion</h1>
+    <p class="subtitle">Accédez à vos notes chiffrées.</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flash-list">
+          {% for m in messages %}<li>{{ m }}</li>{% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field">
+        <label for="username">Nom d'utilisateur</label>
+        <input type="text" id="username" name="username" required>
+      </div>
+      <div class="field">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      <button type="submit" class="btn">Se connecter</button>
+      <div class="card-links">
+        <a href="{{ url_for('forgot_password') }}">Mot de passe oublié ?</a>
+      </div>
+    </form>
+
+    <div class="card-footer">
+      Pas encore de compte ? <a href="{{ url_for('register') }}">S'inscrire</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
