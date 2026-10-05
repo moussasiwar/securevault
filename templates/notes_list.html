@@ -11,25 +11,64 @@
     <a href="{{ url_for('dashboard') }}" class="logout-link">Tableau de bord</a>
   </div>
 
-  <a href="{{ url_for('notes_new') }}" class="btn" style="width:auto; display:inline-flex; padding:0.6rem 1.2rem; margin-bottom:1.25rem;">+ Nouvelle note</a>
+  <a href="{{ url_for('notes_new') }}" class="btn btn-inline">
+    <svg class="btn__lock" viewBox="0 0 16 16" fill="none">
+      <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+    Nouvelle note
+  </a>
 
   {% if notes %}
-  <table class="data-table">
-    <thead>
-      <tr><th>Titre</th><th>Créée le</th><th></th></tr>
-    </thead>
+  <table class="vault-table">
     <tbody>
       {% for n in notes %}
-      <tr>
-        <td><a href="{{ url_for('notes_view', note_id=n.id) }}" style="color:var(--text); text-decoration:none;">{{ n.title }}</a></td>
-        <td>{{ n.created_at }}</td>
-        <td><a href="{{ url_for('notes_view', note_id=n.id) }}" style="color:var(--accent); text-decoration:none;">Ouvrir</a></td>
+      <tr class="vault-row">
+        <td style="width:40px;">
+          <span class="vault-tag">{{ "%02d"|format(n.id) }}</span>
+        </td>
+        <td>
+          <div class="vault-title">
+            <span class="vault-title-text">{{ n.title }}</span>
+          </div>
+        </td>
+        <td>
+          <span class="vault-date">{{ n.created_at }}</span>
+        </td>
+        <td>
+          <div class="vault-actions">
+            <a href="{{ url_for('notes_view', note_id=n.id) }}" class="icon-btn icon-btn--view" data-tip="Ouvrir">
+              <svg viewBox="0 0 16 16" fill="none">
+                <path d="M1 8s2.5-4.5 7-4.5S15 8 15 8s-2.5 4.5-7 4.5S1 8 1 8Z" stroke="currentColor" stroke-width="1.3"/>
+                <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/>
+              </svg>
+            </a>
+            <a href="{{ url_for('notes_edit', note_id=n.id) }}" class="icon-btn icon-btn--edit" data-tip="Modifier">
+              <svg viewBox="0 0 16 16" fill="none">
+                <path d="M11 2.5 13.5 5 5 13.5H2.5V11L11 2.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+              </svg>
+            </a>
+            <form method="POST" action="{{ url_for('notes_delete', note_id=n.id) }}" onsubmit="return confirm('Supprimer cette note ?');" style="display:inline;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="icon-btn icon-btn--delete" data-tip="Supprimer">
+                <svg viewBox="0 0 16 16" fill="none">
+                  <path d="M2.5 4.5h11M5.5 4.5V3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v1.5M6.5 7.5v4M9.5 7.5v4M3.5 4.5l.6 8.4a1 1 0 0 0 1 .93h5.8a1 1 0 0 0 1-.93l.6-8.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </form>
+          </div>
+        </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
   {% else %}
-  <div class="panel">Aucune note pour le moment.</div>
+  <div class="panel vault-empty">
+    <svg class="vault-empty__icon" viewBox="0 0 24 24" fill="none">
+      <rect x="4" y="9" width="16" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+      <path d="M7.5 9V6a4.5 4.5 0 0 1 9 0v3" stroke="currentColor" stroke-width="1.3"/>
+    </svg>
+    <p>Le coffre est vide pour l'instant.</p>
+  </div>
   {% endif %}
 </div>
 {% endblock %}

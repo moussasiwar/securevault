@@ -52,7 +52,7 @@ body {
   min-height: 100vh;
 }
 
-/* ---------- Brand mark ---------- */
+/* ---------- Brand mark : la molette tourne lentement en continu ---------- */
 
 .brand {
   display: flex;
@@ -107,9 +107,10 @@ body {
   padding: 0 1.5rem 3rem;
 }
 
-/* ---------- Auth card ---------- */
+/* ---------- Auth card : porte de coffre, rivets aux coins ---------- */
 
 .card {
+  position: relative;
   width: 100%;
   max-width: 400px;
   background: var(--panel);
@@ -118,6 +119,21 @@ body {
   box-shadow: var(--shadow);
   padding: 2rem 2rem 1.75rem;
 }
+
+.card::before,
+.card::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #4a3c15, #000 120%);
+  box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.15);
+  top: 10px;
+}
+
+.card::before { left: 10px; }
+.card::after { right: 10px; }
 
 .card h1 {
   margin: 0 0 0.35rem;
@@ -145,7 +161,8 @@ body {
   color: var(--text-muted);
 }
 
-.field input {
+.field input,
+.field textarea {
   width: 100%;
   padding: 0.65rem 0.75rem;
   background: var(--bg);
@@ -154,10 +171,11 @@ body {
   color: var(--text);
   font-family: var(--font-ui);
   font-size: 0.92rem;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.field input:focus {
+.field input:focus,
+.field textarea:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-dim);
@@ -169,28 +187,254 @@ body {
   color: var(--text-faint);
 }
 
+/* ---------- Bouton principal : relief métallique + cadenas qui s'ouvre ---------- */
+
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.55rem;
   width: 100%;
   padding: 0.7rem 1rem;
-  background: var(--accent);
+  background: linear-gradient(180deg, var(--accent-hover), var(--accent) 60%);
   color: #1a1407;
   border: none;
   border-radius: var(--radius);
   font-size: 0.92rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s ease;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.2),
+    0 3px 8px rgba(201, 162, 39, 0.25);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.2s ease;
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.55s ease;
+  pointer-events: none;
+}
+
+.btn:hover::before {
+  left: 130%;
 }
 
 .btn:hover {
-  background: var(--accent-hover);
+  background: linear-gradient(180deg, #f0c948, var(--accent-hover) 60%);
 }
 
 .btn:active {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.99);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.3),
+    0 1px 3px rgba(201, 162, 39, 0.2);
+}
+
+.btn__lock {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.btn__lock .shackle {
+  transform-origin: 8px 7px;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn:hover .btn__lock .shackle {
+  transform: translateX(-2px) rotate(-18deg);
+}
+
+.btn-inline {
+  width: auto;
+  display: inline-flex;
+  padding: 0.6rem 1.2rem;
+  margin-bottom: 1.25rem;
+}
+
+/* ---------- Bouton "Modifier" : crayon qui écrit ---------- */
+
+.edit-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  border: 1px solid var(--panel-border);
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius);
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.edit-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--accent-dim);
+  transform: translateY(100%);
+  transition: transform 0.2s ease;
+  z-index: -1;
+}
+
+.edit-link:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.edit-link:hover::before {
+  transform: translateY(0);
+}
+
+.edit-link__pencil {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.edit-link:hover .edit-link__pencil {
+  transform: rotate(-12deg) translateY(-1px);
+}
+
+/* ---------- Bouton destructeur : alarme qui se déclenche ---------- */
+
+.btn-danger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid rgba(217, 83, 79, 0.4);
+  border-radius: var(--radius);
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.25s ease, letter-spacing 0.25s ease;
+}
+
+.btn-danger::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--danger);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+  z-index: -1;
+}
+
+.btn-danger::after {
+  content: "⚠";
+  display: inline-block;
+  opacity: 0;
+  transform: scale(0.5) rotate(-15deg);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.btn-danger:hover {
+  color: #1a0b0a;
+}
+
+.btn-danger:hover::before {
+  transform: scaleX(1);
+}
+
+.btn-danger:hover::after {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+/* ---------- Bouton secondaire neutre (retour, tableau de bord...) ---------- */
+
+.logout-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  border: 1px solid var(--panel-border);
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius);
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.logout-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--panel-border);
+  transform: translateY(100%);
+  transition: transform 0.2s ease;
+  z-index: -1;
+}
+
+.logout-link:hover {
+  border-color: var(--text-muted);
+}
+
+.logout-link:hover::before {
+  transform: translateY(0);
+}
+
+.dash-header .logout-link:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.dash-header .logout-link::before {
+  background: var(--danger-dim);
+}
+
+/* ---------- Liens discrets : soulignement qui se dessine (PAS statique) ---------- */
+
+.link-draw,
+.card-footer a {
+  position: relative;
+  color: var(--accent);
+  text-decoration: none;
+  padding-bottom: 1px;
+}
+
+.link-draw::after,
+.card-footer a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.25s ease;
+}
+
+.link-draw:hover::after,
+.card-footer a:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
 .card-footer {
@@ -202,14 +446,7 @@ body {
   text-align: center;
 }
 
-.card-footer a {
-  color: var(--accent);
-  text-decoration: none;
-}
-
-.card-footer a:hover {
-  text-decoration: underline;
-}
+/* ---------- Liens de navigation : flèche qui glisse ---------- */
 
 .card-links {
   display: flex;
@@ -221,10 +458,28 @@ body {
 .card-links a {
   color: var(--text-muted);
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: color 0.15s ease, gap 0.15s ease;
 }
 
 .card-links a:hover {
   color: var(--accent);
+  gap: 0.45rem;
+}
+
+.card-links a::before {
+  content: "→";
+  display: inline-block;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.card-links a:hover::before {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 /* ---------- Flash messages ---------- */
@@ -264,20 +519,6 @@ body {
   font-weight: 600;
 }
 
-.dash-header .logout-link {
-  color: var(--text-muted);
-  text-decoration: none;
-  font-size: 0.85rem;
-  border: 1px solid var(--panel-border);
-  padding: 0.4rem 0.8rem;
-  border-radius: var(--radius);
-}
-
-.dash-header .logout-link:hover {
-  border-color: var(--danger);
-  color: var(--danger);
-}
-
 .role-badge {
   display: inline-flex;
   align-items: center;
@@ -297,11 +538,44 @@ body {
   border-color: rgba(79, 168, 122, 0.3);
 }
 
+/* ---------- Panel : porte de coffre avec rivets, bascule au survol si lien ---------- */
+
 .panel {
+  position: relative;
   background: var(--panel);
   border: 1px solid var(--panel-border);
   border-radius: var(--radius);
   padding: 1.5rem;
+  transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.panel--link {
+  cursor: pointer;
+}
+
+.panel--link:hover {
+  border-color: var(--accent);
+  transform: translateX(3px);
+}
+
+.panel a {
+  position: relative;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.panel a::after {
+  content: "→";
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.panel--link:hover a::after {
+  transform: translateX(4px);
 }
 
 .meta-row {
@@ -313,7 +587,40 @@ body {
   margin-top: 0.3rem;
 }
 
-/* ---------- Table (admin views, semaine 3) ---------- */
+/* ---------- Pastille de statut (Actif / Désactivé) ---------- */
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.status-pill__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.status-pill--active .status-pill__dot {
+  background: var(--success);
+  box-shadow: 0 0 0 3px var(--success-dim);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.status-pill--active {
+  color: var(--success);
+}
+
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 3px var(--success-dim); }
+  50% { box-shadow: 0 0 0 5px transparent; }
+}
+
+/* ---------- Table (notes, admin) ---------- */
 
 table.data-table {
   width: 100%;
@@ -336,17 +643,104 @@ table.data-table {
   padding: 0.6rem 0.75rem;
   border-bottom: 1px solid var(--panel-border);
   color: var(--text);
+  transition: background 0.15s ease;
+}
+
+.data-table tr:hover td {
+  background: rgba(201, 162, 39, 0.04);
 }
 
 .data-table tr:last-child td {
   border-bottom: none;
 }
 
+.data-table a {
+  position: relative;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.data-table a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.2s ease;
+}
+
+.data-table a:hover {
+  color: var(--accent);
+}
+
+.data-table a:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.data-table select {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--panel-border);
+  border-radius: 4px;
+  padding: 0.3rem 0.5rem;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.data-table select:hover {
+  border-color: var(--accent);
+}
+
+/* petit bouton toggle actif/désactiver, plus visible que logout-link générique */
+
+.btn-toggle {
+  position: relative;
+  background: transparent;
+  border: 1px solid var(--panel-border);
+  color: var(--text-muted);
+  border-radius: 4px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-toggle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--panel-border);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.2s ease;
+  z-index: -1;
+}
+
+.btn-toggle:hover {
+  color: var(--text);
+  border-color: var(--panel-border-hover);
+}
+
+.btn-toggle:hover::before {
+  transform: scaleY(1);
+}
+
 /* ---------- Accessibility ---------- */
 
 a:focus-visible,
 button:focus-visible,
-input:focus-visible {
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -354,6 +748,7 @@ input:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
+    animation: none !important;
   }
 }
 
@@ -361,4 +756,349 @@ input:focus-visible {
   .card {
     padding: 1.5rem 1.25rem;
   }
+}
+
+/* ============================================
+   Tiroirs de notes — liste façon coffre-fort
+   ============================================ */
+
+.vault-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.6rem;
+}
+
+.vault-row {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  transition: border-color 0.2s ease, transform 0.15s ease, background 0.2s ease;
+}
+
+.vault-row:hover {
+  border-color: var(--accent);
+  transform: translateX(4px);
+  background: #181f29;
+}
+
+.vault-row td {
+  padding: 0.9rem 1rem;
+  border: none;
+}
+
+.vault-row td:first-child {
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+
+.vault-row td:last-child {
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.vault-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  border: 1px solid rgba(201, 162, 39, 0.3);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.vault-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.vault-title-text {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.vault-date {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}
+
+.vault-actions {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: flex-end;
+}
+
+/* ---------- Boutons icône d'action, chacun avec sa couleur ---------- */
+
+.icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid var(--panel-border);
+  border-radius: 5px;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-decoration: none;
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.icon-btn svg {
+  width: 15px;
+  height: 15px;
+  position: relative;
+  z-index: 1;
+}
+
+.icon-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: scale(0);
+  border-radius: 50%;
+  transition: transform 0.25s ease;
+  z-index: 0;
+}
+
+.icon-btn:hover {
+  transform: translateY(-2px);
+  border-color: transparent;
+}
+
+.icon-btn:hover::before {
+  transform: scale(1.8);
+}
+
+.icon-btn--view:hover {
+  color: var(--accent);
+}
+.icon-btn--view::before {
+  background: var(--accent-dim);
+}
+
+.icon-btn--edit:hover {
+  color: #7fb3e0;
+}
+.icon-btn--edit::before {
+  background: rgba(127, 179, 224, 0.15);
+}
+
+.icon-btn--delete:hover {
+  color: var(--danger);
+}
+.icon-btn--delete::before {
+  background: var(--danger-dim);
+}
+
+/* tooltip minimal au survol */
+.icon-btn[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #000;
+  color: var(--text);
+  font-size: 0.68rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 2;
+}
+
+.icon-btn:hover[data-tip]::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.vault-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-faint);
+}
+
+.vault-empty__icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 1rem;
+  opacity: 0.4;
+}
+
+/* ============================================
+   Page de note individuelle — sceau + actions
+   ============================================ */
+
+.note-seal {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.3rem;
+}
+
+.note-seal__ring {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.note-seal__ring::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border: 1px dashed rgba(201, 162, 39, 0.35);
+  border-radius: 50%;
+}
+
+.note-seal__ring svg {
+  width: 15px;
+  height: 15px;
+}
+
+.note-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+/* ============================================
+   Journaux d'audit — registre de surveillance
+   ============================================ */
+
+.log-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.4rem;
+}
+
+.log-row {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.log-row:hover {
+  border-color: var(--panel-border-hover);
+  background: #181f29;
+}
+
+.log-row td {
+  padding: 0.7rem 0.9rem;
+  border: none;
+  vertical-align: middle;
+}
+
+.log-row td:first-child {
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+
+.log-row td:last-child {
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.log-time {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.log-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.log-user__avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.log-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.log-action svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+/* catégories de couleur par type d'événement */
+.log-action--success {
+  background: var(--success-dim);
+  color: var(--success);
+}
+
+.log-action--danger {
+  background: var(--danger-dim);
+  color: var(--danger);
+}
+
+.log-action--neutral {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.log-action--muted {
+  background: rgba(139, 150, 165, 0.1);
+  color: var(--text-muted);
+}
+
+.log-details {
+  font-size: 0.82rem;
+  color: var(--text-faint);
+}
+
+.log-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-faint);
+}
+
+.log-empty__icon {
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 1rem;
+  opacity: 0.4;
 }

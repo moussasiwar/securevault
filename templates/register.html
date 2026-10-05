@@ -32,7 +32,13 @@
         <label for="confirm_password">Confirmer le mot de passe</label>
         <input type="password" id="confirm_password" name="confirm_password" required>
       </div>
-      <button type="submit" class="btn">Créer le compte</button>
+      <button type="submit" class="btn">
+        <svg class="btn__lock" viewBox="0 0 16 16" fill="none">
+          <rect x="3" y="7" width="10" height="7" rx="1.5" fill="currentColor"/>
+          <path class="shackle" d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        </svg>
+        Créer le compte
+      </button>
     </form>
 
     <div class="card-footer">

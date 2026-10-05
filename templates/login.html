@@ -23,14 +23,20 @@
         <label for="password">Mot de passe</label>
         <input type="password" id="password" name="password" required>
       </div>
-      <button type="submit" class="btn">Se connecter</button>
+      <button type="submit" class="btn">
+        <svg class="btn__lock" viewBox="0 0 16 16" fill="none">
+          <rect x="3" y="7" width="10" height="7" rx="1.5" fill="currentColor"/>
+          <path class="shackle" d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        </svg>
+        Se connecter
+      </button>
       <div class="card-links">
         <a href="{{ url_for('forgot_password') }}">Mot de passe oublié ?</a>
       </div>
     </form>
 
     <div class="card-footer">
-      Pas encore de compte ? <a href="{{ url_for('register') }}">S'inscrire</a>
+      Pas encore de compte ? <a href="{{ url_for('register') }}" class="link-draw">S'inscrire</a>
     </div>
   </div>
 </div>

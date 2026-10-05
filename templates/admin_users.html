@@ -24,17 +24,22 @@
         <td>
           <form method="POST" action="{{ url_for('admin_change_role', user_id=u.id) }}" style="display:inline;">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <select name="role" onchange="this.form.submit()" style="background:var(--bg); color:var(--text); border:1px solid var(--panel-border); border-radius:4px; padding:0.2rem;">
+            <select name="role" onchange="this.form.submit()">
               <option value="user" {{ 'selected' if u.role == 'user' }}>user</option>
               <option value="admin" {{ 'selected' if u.role == 'admin' }}>admin</option>
             </select>
           </form>
         </td>
-        <td>{{ 'Actif' if u.is_active else 'Désactivé' }}</td>
+        <td>
+          <span class="status-pill {{ 'status-pill--active' if u.is_active }}">
+            <span class="status-pill__dot"></span>
+            {{ 'Actif' if u.is_active else 'Désactivé' }}
+          </span>
+        </td>
         <td>
           <form method="POST" action="{{ url_for('admin_toggle_user', user_id=u.id) }}" style="display:inline;">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" style="background:none; border:1px solid var(--panel-border); color:var(--text-muted); border-radius:4px; padding:0.25rem 0.6rem; cursor:pointer;">
+            <button type="submit" class="btn-toggle">
               {{ 'Désactiver' if u.is_active else 'Activer' }}
             </button>
           </form>
