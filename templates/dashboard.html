@@ -11,8 +11,13 @@
     <a href="{{ url_for('logout') }}" class="logout-link">Se déconnecter</a>
   </div>
 
+  {% if user.role == 'admin' %}
+<div class="panel" style="margin-top:1rem;">
+  <p><a href="{{ url_for('admin_users') }}" style="color:var(--accent);">Administration →</a></p>
+</div>
+{% endif %}
   <div class="panel">
-    <p>Vos notes chiffrées apparaîtront ici (semaine 3).</p>
-  </div>
+  <p><a href="{{ url_for('notes_list') }}" style="color:var(--accent);">Voir mes notes →</a></p>
+</div>
 </div>
 {% endblock %}

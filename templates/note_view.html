@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="app-shell">
+  <div class="dash-header">
+    <h1>{{ note.title }}</h1>
+    <a href="{{ url_for('notes_list') }}" class="logout-link">Retour</a>
+  </div>
+  <div class="panel">
+    <p style="white-space:pre-wrap;">{{ note.content }}</p>
+    <div class="meta-row">Créée le {{ note.created_at }}</div>
+  </div>
+  <div style="margin-top:1rem; display:flex; gap:0.75rem;">
+    <a href="{{ url_for('notes_edit', note_id=note.id) }}" class="logout-link">Modifier</a>
+    <form method="POST" action="{{ url_for('notes_delete', note_id=note.id) }}" onsubmit="return confirm('Supprimer cette note ?');">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="logout-link" style="background:none; cursor:pointer; font-family:var(--font-ui); font-size:0.85rem; color:var(--danger); border-color:var(--panel-border);">Supprimer</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

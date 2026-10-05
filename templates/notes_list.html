@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="app-shell">
+  <div class="dash-header">
+    <div>
+      <h1>Mes notes</h1>
+      <div class="meta-row">
+        <span class="role-badge {{ 'role-badge--admin' if user.role == 'admin' }}">{{ user.role }}</span>
+      </div>
+    </div>
+    <a href="{{ url_for('dashboard') }}" class="logout-link">Tableau de bord</a>
+  </div>
+
+  <a href="{{ url_for('notes_new') }}" class="btn" style="width:auto; display:inline-flex; padding:0.6rem 1.2rem; margin-bottom:1.25rem;">+ Nouvelle note</a>
+
+  {% if notes %}
+  <table class="data-table">
+    <thead>
+      <tr><th>Titre</th><th>Créée le</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for n in notes %}
+      <tr>
+        <td><a href="{{ url_for('notes_view', note_id=n.id) }}" style="color:var(--text); text-decoration:none;">{{ n.title }}</a></td>
+        <td>{{ n.created_at }}</td>
+        <td><a href="{{ url_for('notes_view', note_id=n.id) }}" style="color:var(--accent); text-decoration:none;">Ouvrir</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="panel">Aucune note pour le moment.</div>
+  {% endif %}
+</div>
+{% endblock %}

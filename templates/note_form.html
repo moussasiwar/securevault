@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="app-shell">
+  <div class="dash-header">
+    <h1>{{ 'Modifier la note' if note else 'Nouvelle note' }}</h1>
+    <a href="{{ url_for('notes_list') }}" class="logout-link">Retour</a>
+  </div>
+  <div class="panel">
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field">
+        <label for="title">Titre</label>
+        <input type="text" id="title" name="title" value="{{ note.title if note else '' }}" required>
+      </div>
+      <div class="field">
+        <label for="content">Contenu</label>
+        <textarea id="content" name="content" rows="8" required style="width:100%; padding:0.65rem 0.75rem; background:var(--bg); border:1px solid var(--panel-border); border-radius:var(--radius); color:var(--text); font-family:var(--font-ui);">{{ note.content if note else '' }}</textarea>
+      </div>
+      <button type="submit" class="btn" style="width:auto; padding:0.6rem 1.2rem;">Enregistrer</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

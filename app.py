@@ -4,7 +4,11 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_wtf.csrf import CSRFProtect
 from auth import create_reset_token, reset_password
-
+from notes import create_note, list_notes, get_note, update_note, delete_note
+from decorators import role_required
+from admin import list_users, set_user_active, set_user_role, list_audit_logs
+from flask import Flask, request, session, redirect, url_for, render_template, flash, abort
+from notes import create_note, list_notes, get_note, update_note, delete_note
 from auth import register_user, authenticate_user, destroy_session, get_session_user, validate_password, validate_email
 from decorators import login_required
 
@@ -77,7 +81,6 @@ def login():
 
         session.clear()
         session["sid"] = user["session_id"]
-        session.permanent = True
         return redirect(url_for("dashboard"))
 
     return render_template("login.html")
@@ -124,5 +127,106 @@ def dashboard():
     return render_template("dashboard.html", user=user)
 
 
+@app.route("/notes")
+@login_required
+def notes_list():
+    user = get_session_user(session.get("sid"))
+    notes = list_notes(user["id"])
+    return render_template("notes_list.html", notes=notes, user=user)
+
+
+@app.route("/notes/new", methods=["GET", "POST"])
+@login_required
+def notes_new():
+    user = get_session_user(session.get("sid"))
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        content = request.form.get("content", "").strip()
+        if not title or not content:
+            flash("Titre et contenu requis.")
+            return render_template("note_form.html", user=user)
+        create_note(user["id"], title, content)
+        return redirect(url_for("notes_list"))
+    return render_template("note_form.html", user=user)
+
+
+@app.route("/notes/<int:note_id>")
+@login_required
+def notes_view(note_id):
+    user = get_session_user(session.get("sid"))
+    note = get_note(note_id, user["id"])
+    if note is None:
+        abort(404)
+    return render_template("note_view.html", note=note, user=user)
+
+
+@app.route("/notes/<int:note_id>/edit", methods=["GET", "POST"])
+@login_required
+def notes_edit(note_id):
+    user = get_session_user(session.get("sid"))
+    note = get_note(note_id, user["id"])
+    if note is None:
+        abort(404)
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        content = request.form.get("content", "").strip()
+        update_note(note_id, user["id"], title, content)
+        return redirect(url_for("notes_view", note_id=note_id))
+    return render_template("note_form.html", note=note, user=user)
+
+
+@app.route("/notes/<int:note_id>/delete", methods=["POST"])
+@login_required
+def notes_delete(note_id):
+    user = get_session_user(session.get("sid"))
+    delete_note(note_id, user["id"])
+    return redirect(url_for("notes_list"))
+
+
+@app.route("/admin/users")
+@role_required("admin")
+def admin_users():
+    user = get_session_user(session.get("sid"))
+    users = list_users()
+    return render_template("admin_users.html", users=users, user=user)
+
+
+@app.route("/admin/users/<int:user_id>/toggle", methods=["POST"])
+@role_required("admin")
+def admin_toggle_user(user_id):
+    admin = get_session_user(session.get("sid"))
+    if user_id == admin["id"]:
+        flash("Vous ne pouvez pas désactiver votre propre compte.")
+        return redirect(url_for("admin_users"))
+    users = {u["id"]: u for u in list_users()}
+    target = users.get(user_id)
+    if target:
+        set_user_active(admin["id"], user_id, not target["is_active"])
+    return redirect(url_for("admin_users"))
+
+
+@app.route("/admin/users/<int:user_id>/role", methods=["POST"])
+@role_required("admin")
+def admin_change_role(user_id):
+    admin = get_session_user(session.get("sid"))
+    new_role = request.form.get("role")
+    if user_id == admin["id"]:
+        flash("Vous ne pouvez pas modifier votre propre rôle.")
+        return redirect(url_for("admin_users"))
+    set_user_role(admin["id"], user_id, new_role)
+    return redirect(url_for("admin_users"))
+
+
+@app.route("/admin/logs")
+@role_required("admin")
+def admin_logs():
+    user = get_session_user(session.get("sid"))
+    logs = list_audit_logs()
+    return render_template("admin_logs.html", logs=logs, user=user)
+
 if __name__ == "__main__":
-    app.run(ssl_context="adhoc")
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        ssl_context=("securevault.local.pem", "securevault.local-key.pem")
+    )
