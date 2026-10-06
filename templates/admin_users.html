@@ -12,22 +12,38 @@
     {% endif %}
   {% endwith %}
 
-  <table class="data-table">
-    <thead>
-      <tr><th>Utilisateur</th><th>Email</th><th>Rôle</th><th>Statut</th><th>Actions</th></tr>
-    </thead>
+  <table class="user-table">
     <tbody>
       {% for u in users %}
-      <tr>
-        <td>{{ u.username }}</td>
-        <td>{{ u.email }}</td>
+      <tr class="user-row">
         <td>
-          <form method="POST" action="{{ url_for('admin_change_role', user_id=u.id) }}" style="display:inline;">
+          <div class="user-identity">
+            <span class="user-avatar">{{ u.username[:2]|upper }}</span>
+            <div>
+              <div class="user-name">{{ u.username }}</div>
+              <div class="user-email">{{ u.email }}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="role-dropdown {{ 'role-dropdown--admin' if u.role == 'admin' }}" data-user-id="{{ u.id }}">
+            <button type="button" class="role-dropdown__trigger">
+              <span class="role-label">{{ u.role }}</span>
+              <svg viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </button>
+            <div class="role-dropdown__menu">
+              <button type="button" class="role-dropdown__option {{ 'is-current' if u.role == 'user' }}" data-role="user">
+                <span class="role-dropdown__option-dot"></span> user
+              </button>
+              <button type="button" class="role-dropdown__option {{ 'is-current' if u.role == 'admin' }}" data-role="admin">
+                <span class="role-dropdown__option-dot"></span> admin
+              </button>
+            </div>
+          </div>
+
+          <form id="role-form-{{ u.id }}" method="POST" action="{{ url_for('admin_change_role', user_id=u.id) }}" style="display:none;">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <select name="role" onchange="this.form.submit()">
-              <option value="user" {{ 'selected' if u.role == 'user' }}>user</option>
-              <option value="admin" {{ 'selected' if u.role == 'admin' }}>admin</option>
-            </select>
+            <input type="hidden" name="role" id="role-input-{{ u.id }}" value="{{ u.role }}">
           </form>
         </td>
         <td>
@@ -37,9 +53,12 @@
           </span>
         </td>
         <td>
-          <form method="POST" action="{{ url_for('admin_toggle_user', user_id=u.id) }}" style="display:inline;">
+          <form method="POST" action="{{ url_for('admin_toggle_user', user_id=u.id) }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" class="btn-toggle">
+            <button type="submit" class="toggle-switch {{ 'toggle-switch--on' if u.is_active else 'toggle-switch--off' }}">
+              <span class="toggle-switch__track">
+                <span class="toggle-switch__thumb"></span>
+              </span>
               {{ 'Désactiver' if u.is_active else 'Activer' }}
             </button>
           </form>
@@ -49,4 +68,6 @@
     </tbody>
   </table>
 </div>
+
+<script src="{{ url_for('static', filename='admin.js') }}"></script>
 {% endblock %}

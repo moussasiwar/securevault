@@ -1102,3 +1102,301 @@ select:focus-visible {
   margin: 0 auto 1rem;
   opacity: 0.4;
 }
+
+
+/* ============================================
+   Gestion des utilisateurs — registre d'accès
+   ============================================ */
+
+.user-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.5rem;
+}
+
+.user-row {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  transition: border-color 0.2s ease, transform 0.15s ease, background 0.2s ease;
+}
+
+.user-row:hover {
+  border-color: var(--panel-border-hover);
+  transform: translateX(3px);
+  background: #181f29;
+}
+
+/* La ligne qui contient un menu ouvert passe au-dessus des autres */
+.user-row:has(.role-dropdown.is-open) {
+  position: relative;
+  z-index: 20;
+}
+
+.user-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid rgba(201, 162, 39, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.user-row:has(.role-chip--admin) .user-avatar {
+  background: var(--success-dim);
+  color: var(--success);
+  border-color: rgba(79, 168, 122, 0.3);
+}
+
+.user-name {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.user-email {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-faint);
+}
+
+/* ---------- Sélecteur de rôle façon badge ---------- */
+
+.role-select-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.role-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid rgba(201, 162, 39, 0.3);
+  border-radius: 20px;
+  padding: 0.3rem 1.8rem 0.3rem 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.role-select:hover {
+  border-color: var(--accent);
+}
+
+/* quand "admin" est sélectionné, le badge devient vert via data-attribute géré en Jinja */
+.role-select[data-role="admin"] {
+  background: var(--success-dim);
+  color: var(--success);
+  border-color: rgba(79, 168, 122, 0.3);
+}
+
+.role-select-wrap::after {
+  content: "";
+  position: absolute;
+  right: 0.7rem;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-65%) rotate(45deg);
+  color: var(--accent);
+  pointer-events: none;
+}
+
+/* ---------- Bouton toggle actif/désactiver en icône interrupteur ---------- */
+
+.toggle-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.2rem;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+
+.toggle-switch:hover {
+  color: var(--text);
+}
+
+.toggle-switch__track {
+  width: 34px;
+  height: 18px;
+  border-radius: 20px;
+  background: var(--panel-border);
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.toggle-switch__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.toggle-switch--on .toggle-switch__track {
+  background: var(--success-dim);
+  border: 1px solid rgba(79, 168, 122, 0.4);
+}
+
+.toggle-switch--on .toggle-switch__thumb {
+  transform: translateX(16px);
+  background: var(--success);
+}
+
+.toggle-switch--off .toggle-switch__track {
+  background: rgba(217, 83, 79, 0.08);
+  border: 1px solid rgba(217, 83, 79, 0.3);
+}
+
+.toggle-switch--off .toggle-switch__thumb {
+  background: var(--danger);
+}
+
+/* ============================================
+   Menu déroulant de rôle personnalisé
+   ============================================ */
+
+.role-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.role-dropdown__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid rgba(201, 162, 39, 0.3);
+  border-radius: 20px;
+  padding: 0.35rem 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.role-dropdown__trigger:hover {
+  border-color: var(--accent);
+}
+
+.role-dropdown--admin .role-dropdown__trigger {
+  background: var(--success-dim);
+  color: var(--success);
+  border-color: rgba(79, 168, 122, 0.3);
+}
+
+.role-dropdown__trigger svg {
+  width: 10px;
+  height: 10px;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.role-dropdown.is-open .role-dropdown__trigger svg {
+  transform: rotate(180deg);
+}
+
+.role-dropdown__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 140px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 0.35rem;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  z-index: 100;
+}
+
+.role-dropdown.is-open .role-dropdown__menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.role-dropdown__option {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.role-dropdown__option:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.role-dropdown__option-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.role-dropdown__option[data-role="user"] .role-dropdown__option-dot {
+  background: var(--accent);
+}
+
+.role-dropdown__option[data-role="admin"] .role-dropdown__option-dot {
+  background: var(--success);
+}
+
+.role-dropdown__option.is-current {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.role-dropdown__option.is-current::after {
+  content: "✓";
+  margin-left: auto;
+  color: var(--accent);
+  font-size: 0.75rem;
+}
