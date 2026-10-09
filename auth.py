@@ -1,4 +1,5 @@
 import re
+import time
 import secrets
 from datetime import datetime, timedelta
 from argon2 import PasswordHasher
@@ -8,7 +9,7 @@ from db import get_db
 
 ph = PasswordHasher()  # Argon2id par défaut
 
-SESSION_DURATION_MINUTES = 30
+SESSION_DURATION_MINUTES = 20
 MAX_FAILED_ATTEMPTS = 5
 LOCK_DURATION_MINUTES = 15
 
@@ -65,19 +66,18 @@ def authenticate_user(username: str, password: str, ip: str = ""):
             "SELECT * FROM users WHERE username = ?", (username,)
         ).fetchone()
 
-        # Message générique dans tous les cas d'échec (pas d'énumération de comptes)
         generic_error = "Identifiants invalides."
 
         if user is None:
             log_action(db, None, "LOGIN_FAIL", f"Utilisateur inconnu: {username}", ip)
             return None, generic_error
 
-        # Vérifier le verrouillage du compte
+        # Verrouillage : meme message generique, mais log distinct en interne
         if user["locked_until"]:
             locked_until = datetime.fromisoformat(user["locked_until"])
             if datetime.now() < locked_until:
-                log_action(db, user["id"], "LOGIN_LOCKED", "Compte verrouillé", ip)
-                return None, "Compte temporairement verrouillé. Réessayez plus tard."
+                log_action(db, user["id"], "LOGIN_LOCKED", "Tentative sur compte verrouillé", ip)
+                return None, generic_error  # <- plus de message distinct
 
         if not user["is_active"]:
             log_action(db, user["id"], "LOGIN_DISABLED", "Compte désactivé", ip)
@@ -90,7 +90,6 @@ def authenticate_user(username: str, password: str, ip: str = ""):
             log_action(db, user["id"], "LOGIN_FAIL", "Mot de passe incorrect", ip)
             return None, generic_error
 
-        # Succès : réinitialiser les échecs et créer la session
         db.execute(
             "UPDATE users SET failed_attempts = 0, locked_until = NULL WHERE id = ?",
             (user["id"],),
@@ -114,6 +113,10 @@ def _register_failed_attempt(db, user):
         (attempts, locked_until, user["id"]),
     )
     db.commit()
+
+    # Delai progressif : 0.5s, 1s, 1.5s, 2s... plafonne a 3s
+    delay = min(attempts * 0.5, 3.0)
+    time.sleep(delay)
 
 
 # ---------- Sessions ----------

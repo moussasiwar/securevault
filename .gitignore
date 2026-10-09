@@ -2,3 +2,4 @@ venv/
 *.db
 *.pem
 __pycache__/
+run.ps1

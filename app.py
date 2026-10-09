@@ -18,7 +18,7 @@ app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_SAMESITE="Strict",
-    PERMANENT_SESSION_LIFETIME=1800,
+    PERMANENT_SESSION_LIFETIME=1500,
 )
 
 csrf = CSRFProtect(app)
@@ -30,8 +30,8 @@ def set_security_headers(resp):
     resp.headers["X-Content-Type-Options"] = "nosniff"
     resp.headers["X-Frame-Options"] = "DENY"
     resp.headers["Content-Security-Policy"] = "default-src 'self'"
+    resp.headers["Server"] = "SecureVault"  # remplace la bannière Werkzeug/Python
     return resp
-
 
 @app.route("/")
 def index():
@@ -224,9 +224,21 @@ def admin_logs():
     logs = list_audit_logs()
     return render_template("admin_logs.html", logs=logs, user=user)
 
+
+def mask_token(token: str) -> str:
+    """Utilitaire pour afficher un token tronqué dans les logs de debug,
+    jamais sa valeur complète."""
+    if not token or len(token) < 8:
+        return "***"
+    return f"{token[:4]}...{token[-4:]}"
+
 if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=5000,
-        ssl_context=("securevault.local.pem", "securevault.local-key.pem")
+        debug=False,
+        ssl_context=(
+            "securevault.local.pem",
+            "securevault.local-key.pem"
+        )
     )
