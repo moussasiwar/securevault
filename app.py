@@ -1,4 +1,5 @@
 import os
+import re
 from flask import Flask, request, session, redirect, url_for, render_template, flash
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -24,13 +25,25 @@ app.config.update(
 csrf = CSRFProtect(app)
 limiter = Limiter(get_remote_address, app=app, default_limits=["200 per day"])
 
+def mask_sensitive(text: str) -> str:
+    text = re.sub(r'session=[^;\s\n"]+', 'session=***MASKED***', text)
+    text = re.sub(r'csrf_token=[^&\s\n"]+', 'csrf_token=***MASKED***', text)
+    text = re.sub(r'(name="csrf_token"\s+value=")[^"]+(")', r'\1***MASKED***\2', text)
+    return text
+MASK_RESPONSES = os.environ.get("SECUREVAULT_MASK_CAPTURES") == "1"
 
 @app.after_request
 def set_security_headers(resp):
     resp.headers["X-Content-Type-Options"] = "nosniff"
     resp.headers["X-Frame-Options"] = "DENY"
     resp.headers["Content-Security-Policy"] = "default-src 'self'"
-    resp.headers["Server"] = "SecureVault"  # remplace la bannière Werkzeug/Python
+    if "Server" in resp.headers:
+        del resp.headers["Server"]
+    resp.headers["Server"] = "SecureVault"
+
+    if MASK_RESPONSES and "Set-Cookie" in resp.headers:
+        resp.headers["Set-Cookie"] = mask_sensitive(resp.headers["Set-Cookie"])
+
     return resp
 
 @app.route("/")
